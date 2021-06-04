@@ -47,3 +47,5 @@ TODO
 
 En sección se presenta un resumen de los problemas presentados en el momento del desarrollo y que pueden ser útiles mas adelante para la resolución de problemas en el futuro.
 
+- **Importante**: una vez creados los buckets debe configurarlos manualmente para realizar la conexión con los repositorios
+
