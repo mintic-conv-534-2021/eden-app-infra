@@ -34,6 +34,8 @@ aws s3api create-bucket --acl public-read \
 aws s3api put-bucket-policy  --bucket $BUCKET_NAME \
                              --policy file://$BUCKET_NAME_POLICY
 
+aws s3 website "s3://$BUCKET_NAME" --index-document index.html --error-document index.html
+
 #se crea bucket para comercios
 BUCKET_NAME="$PREFIX-comercios"
 BUCKET_NAME_POLICY="$BUCKET_NAME-policy.json"
@@ -48,3 +50,4 @@ aws s3api create-bucket --acl public-read \
 aws s3api put-bucket-policy  --bucket $BUCKET_NAME \
                              --policy file://$BUCKET_NAME_POLICY
 
+aws s3 website "s3://$BUCKET_NAME" --index-document index.html --error-document index.html
