@@ -1,8 +1,8 @@
 #!/bin/bash
 
-CLUSTER_NAME=eden-app-backend-poc
-REPO_NAME=eden-app-repo-poc
-AWS_REGION=us-west-2
+CLUSTER_NAME=eden-app-backend
+REPO_NAME=eden-app-repo
+AWS_REGION=us-east-2
 
 #check for needed commands
 command -v eksctl >/dev/null 2>&1 || { echo >&2 "I require eksctl but it's not installed.  Aborting."; exit 1; }
@@ -75,5 +75,12 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n ku
 echo "Inicia creación de repositorio de imagenes docker privado"
 
 aws ecr create-repository --repository-name $REPO_NAME --region $AWS_REGION
-
 #aws ecr create-repository --repository-name eden-app-repo-poc --region us-west-2
+
+#Importante el nombre del namespace debe coincider con los PROFILE descritos en los script de deploy
+#de Github Actions en el proyecto backend.
+kubectl create namespace prod
+
+# se crea namespace para stage
+kubectl create namespace stage
+
