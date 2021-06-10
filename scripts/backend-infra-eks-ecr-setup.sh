@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CLUSTER_NAME=eden-app-backend
+CLUSTER_NAME=eden-app
 REPO_NAME=eden-app-repo
 AWS_REGION=us-east-2
 
@@ -19,7 +19,7 @@ echo "Inicia creación de clúster EKS"
 
 # ejemplo base de: https://nubisoft.io/blog/how-to-set-up-kubernetes-ingress-with-aws-alb-ingress-controller/
 
-# eksctl create cluster --name $CLUSTER_NAME --region $AWS_REGION
+eksctl create cluster --name $CLUSTER_NAME --region $AWS_REGION # --fargate
 
 eksctl utils associate-iam-oidc-provider \
             --region $AWS_REGION \
@@ -27,8 +27,8 @@ eksctl utils associate-iam-oidc-provider \
             --approve
 
 # eksctl utils associate-iam-oidc-provider \
-#            --region us-west-2 \
-#            --cluster eden-app-backend-poc \
+#            --region us-east-2 \
+#            --cluster eden-app-backend \
 #            --approve
 
 curl -o iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.2.0/docs/install/iam_policy.json
@@ -54,28 +54,18 @@ eksctl create iamserviceaccount \
             --override-existing-serviceaccounts \
             --approve
 
-
-# eksctl create iamserviceaccount \
-#            --cluster=eden-app-backend-poc \
-#            --region=us-west-2 \
-#            --namespace=kube-system \
-#            --name=aws-load-balancer-controller \
-#            --attach-policy-arn=arn:aws:iam::017777727880:policy/AWSLoadBalancerControllerIAMPolicy \
-#            --override-existing-serviceaccounts \
-#            --approve
-
 helm repo add eks https://aws.github.io/eks-charts
 
 kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"
 
 helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=$CLUSTER_NAME --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller
 
-#helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=eden-app-backend-poc --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller
+#helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=eden-app-backend --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller
 
 echo "Inicia creación de repositorio de imagenes docker privado"
 
-aws ecr create-repository --repository-name $REPO_NAME --region $AWS_REGION
-#aws ecr create-repository --repository-name eden-app-repo-poc --region us-west-2
+#aws ecr create-repository --repository-name $REPO_NAME --region $AWS_REGION
+#aws ecr create-repository --repository-name eden-app-repo --region us-east-2
 
 #Importante el nombre del namespace debe coincider con los PROFILE descritos en los script de deploy
 #de Github Actions en el proyecto backend.
@@ -83,4 +73,3 @@ kubectl create namespace prod
 
 # se crea namespace para stage
 kubectl create namespace stage
-
